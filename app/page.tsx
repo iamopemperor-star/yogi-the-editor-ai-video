@@ -15,8 +15,8 @@ const C = {
 
 const STEPS = [
   { id: 1, icon: "🎬", label: "Creative Director", desc: "Breaking down your vision"   },
-  { id: 2, icon: "🤖", label: "Gemini AI",          desc: "Engineering the mega prompt" },
-  { id: 3, icon: "🚀", label: "Runway Gen-4.5",     desc: "Rendering your cinematic"   },
+  { id: 2, icon: "✨", label: "AI Prompt Engine",   desc: "Crafting your cinematic brief"},
+  { id: 3, icon: "🎥", label: "Video Rendering",    desc: "Generating your video..."    },
   { id: 4, icon: "⬇️", label: "Finalizing",         desc: "Almost done!"               },
 ];
 
@@ -130,18 +130,25 @@ function BgDecor() {
 
 /* ── MAIN ────────────────────────────────────────────────────── */
 export default function Home() {
-  const [brief, setBrief]       = useState("");
+  const [brief, setBrief]         = useState("");
   const [runwayKey, setRunwayKey] = useState("");
-  const [showKey, setShowKey]   = useState(false);
-  const [status, setStatus]     = useState<"idle"|"loading"|"done"|"error">("idle");
-  const [currentStep, setStep]  = useState(0);
-  const [stepDone, setStepDone] = useState<number[]>([]);
-  const [videoUrl, setVideoUrl] = useState("");
-  const [prompt, setPrompt]     = useState("");
-  const [error, setError]       = useState("");
-  const [mounted, setMounted]   = useState(false);
+  const [showKey, setShowKey]     = useState(false);
+  const [usedFree, setUsedFree]   = useState(false);
+  const [status, setStatus]       = useState<"idle"|"loading"|"done"|"error">("idle");
+  const [currentStep, setStep]    = useState(0);
+  const [stepDone, setStepDone]   = useState<number[]>([]);
+  const [videoUrl, setVideoUrl]   = useState("");
+  const [prompt, setPrompt]       = useState("");
+  const [error, setError]         = useState("");
+  const [mounted, setMounted]     = useState(false);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+    // Check if free video already used (persists across page refresh)
+    if (localStorage.getItem("yte_free_used") === "1") {
+      setUsedFree(true);
+    }
+  }, []);
 
   async function generate() {
     if (!brief.trim()) return;
@@ -164,7 +171,13 @@ export default function Home() {
             const data = JSON.parse(line.slice(5));
             if (data.step)   { setStep(data.step); setStepDone(p => [...p, data.step - 1]); }
             if (data.prompt) setPrompt(data.prompt);
-            if (data.video)  { setVideoUrl(data.video); setStatus("done"); }
+            if (data.video)  {
+              setVideoUrl(data.video);
+              setStatus("done");
+              // Mark free video as used
+              localStorage.setItem("yte_free_used", "1");
+              setUsedFree(true);
+            }
             if (data.error)  { setError(data.error); setStatus("error"); }
           } catch {}
         }
@@ -248,10 +261,10 @@ export default function Home() {
 
             <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "clamp(7px,1.5vw,12px)" }}>
               {[
-                { label: "Gemini 2.5",     color: C.green  },
-                { label: "Runway Gen-4.5", color: C.orange },
-                { label: "HD Cinematic",   color: C.pink   },
-                { label: "Vertical 9:16",  color: C.yellow },
+                { label: "Multi-AI Engine",  color: C.green  },
+                { label: "HD Video",         color: C.orange },
+                { label: "Cinematic Grade",  color: C.pink   },
+                { label: "Vertical 9:16",    color: C.yellow },
               ].map(({ label, color }) => (
                 <span key={label} className="outfit" style={{
                   padding: "4px 14px", borderRadius: 999,
@@ -293,51 +306,75 @@ export default function Home() {
               );
             })}
 
-            {/* Runway API Key */}
-            <div style={{ marginBottom: 18 }}>
-              <label className="bebas" style={{
-                display: "block", fontSize: "clamp(13px,2vw,16px)",
-                letterSpacing: "0.12em", color: C.orange, marginBottom: 8,
+            {/* Runway API Key — sirf tab dikhao jab free video use ho chuki ho */}
+            {usedFree && (
+              <div style={{
+                marginBottom: 18,
+                borderRadius: 12,
+                padding: "clamp(14px,2.5vw,20px)",
+                background: `${C.red}15`,
+                border: `2px solid ${C.red}55`,
+                animation: "reveal-up 0.4s ease-out",
               }}>
-                🔑 Runway API Key
-              </label>
-              <div style={{ position: "relative" }}>
-                <input
-                  type={showKey ? "text" : "password"}
-                  value={runwayKey}
-                  onChange={e => setRunwayKey(e.target.value)}
-                  placeholder="key_xxxxxxxx...  (runway.ml → Account → API Keys)"
-                  disabled={status === "loading"}
-                  className="outfit"
-                  style={{
-                    width: "100%", borderRadius: 10,
-                    padding: "clamp(10px,1.8vw,14px) 48px clamp(10px,1.8vw,14px) clamp(12px,2vw,16px)",
-                    fontSize: "clamp(11px,1.8vw,13px)",
-                    outline: "none",
-                    background: `${C.blue2}cc`,
-                    border: `2px solid ${C.orange}44`,
-                    color: C.cream,
-                    transition: "border-color 0.3s, box-shadow 0.3s",
-                    fontFamily: "inherit",
-                  }}
-                  onFocus={e => { e.target.style.borderColor = C.orange; e.target.style.boxShadow = `0 0 0 3px ${C.orange}22`; }}
-                  onBlur={e  => { e.target.style.borderColor = `${C.orange}44`; e.target.style.boxShadow = "none"; }}
-                />
-                <button onClick={() => setShowKey(v => !v)}
-                  style={{
-                    position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
-                    background: "none", border: "none", cursor: "pointer",
-                    color: `${C.cream}55`, fontSize: 16, padding: 4,
-                  }}
-                  title={showKey ? "Hide key" : "Show key"}
-                >
-                  {showKey ? "🙈" : "👁️"}
-                </button>
+                {/* Unlock message */}
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+                  <div style={{ fontSize: 28 }}>🔐</div>
+                  <div>
+                    <p className="bebas" style={{ fontSize: "clamp(16px,3vw,20px)", color: C.yellow, margin: 0, letterSpacing: "0.1em" }}>
+                      FREE VIDEO USE HO GAYI!
+                    </p>
+                    <p className="outfit" style={{ fontSize: "clamp(10px,1.8vw,12px)", color: `${C.cream}77`, margin: 0 }}>
+                      Apna API key dalo — aur unlimited videos banao
+                    </p>
+                  </div>
+                </div>
+
+                <label className="bebas" style={{
+                  display: "block", fontSize: "clamp(12px,2vw,15px)",
+                  letterSpacing: "0.1em", color: C.orange, marginBottom: 8,
+                }}>
+                  🔑 Apna Video API Key Dalo
+                </label>
+                <div style={{ position: "relative" }}>
+                  <input
+                    type={showKey ? "text" : "password"}
+                    value={runwayKey}
+                    onChange={e => setRunwayKey(e.target.value)}
+                    placeholder="key_xxxxxxxx..."
+                    disabled={status === "loading"}
+                    className="outfit"
+                    style={{
+                      width: "100%", borderRadius: 10,
+                      padding: "clamp(10px,1.8vw,14px) 48px clamp(10px,1.8vw,14px) clamp(12px,2vw,16px)",
+                      fontSize: "clamp(11px,1.8vw,13px)",
+                      outline: "none",
+                      background: `${C.blue2}cc`,
+                      border: `2px solid ${C.orange}55`,
+                      color: C.cream,
+                      transition: "border-color 0.3s, box-shadow 0.3s",
+                      fontFamily: "inherit",
+                    }}
+                    onFocus={e => { e.target.style.borderColor = C.yellow; e.target.style.boxShadow = `0 0 0 3px ${C.yellow}22`; }}
+                    onBlur={e  => { e.target.style.borderColor = `${C.orange}55`; e.target.style.boxShadow = "none"; }}
+                  />
+                  <button onClick={() => setShowKey(v => !v)}
+                    style={{
+                      position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
+                      background: "none", border: "none", cursor: "pointer",
+                      color: `${C.cream}55`, fontSize: 16, padding: 4,
+                    }}
+                  >
+                    {showKey ? "🙈" : "👁️"}
+                  </button>
+                </div>
+                <p className="outfit" style={{ fontSize: "clamp(9px,1.4vw,10px)", marginTop: 8, color: `${C.cream}44` }}>
+                  Free account: <span style={{ color: C.orange, cursor: "pointer" }}
+                    onClick={() => window.open("https://runway.ml", "_blank")}>
+                    runway.ml
+                  </span> → Sign Up → Account → API Keys → Create Key
+                </p>
               </div>
-              <p className="outfit" style={{ fontSize: "clamp(9px,1.4vw,10px)", marginTop: 6, color: `${C.cream}44`, letterSpacing: "0.05em" }}>
-                Free account banao: <span style={{ color: C.orange }}>runway.ml</span> → Sign Up → Account → API Keys → Create Key
-              </p>
-            </div>
+            )}
 
             <label className="bebas" style={{
               display: "block", fontSize: "clamp(14px,2.5vw,18px)",
@@ -401,17 +438,17 @@ export default function Home() {
 
             <button
               onClick={generate}
-              disabled={status === "loading" || !brief.trim()}
+              disabled={status === "loading" || !brief.trim() || (usedFree && !runwayKey.trim())}
               className="bebas"
               style={{
                 width: "100%", marginTop: 20,
                 padding: "clamp(16px,3vw,22px) 24px",
                 borderRadius: 14, fontSize: "clamp(18px,3.5vw,26px)", letterSpacing: "0.12em",
-                background: (!brief.trim() || status === "loading")
+                background: (!brief.trim() || status === "loading" || (usedFree && !runwayKey.trim()))
                   ? "#222"
                   : `linear-gradient(135deg,${C.red} 0%,${C.orange} 50%,${C.yellow} 100%)`,
-                color: (!brief.trim() || status === "loading") ? "#555" : C.dark,
-                cursor: !brief.trim() ? "not-allowed" : "pointer",
+                color: (!brief.trim() || status === "loading" || (usedFree && !runwayKey.trim())) ? "#555" : C.dark,
+                cursor: (!brief.trim() || (usedFree && !runwayKey.trim())) ? "not-allowed" : "pointer",
                 border: "none",
                 boxShadow: (status !== "loading" && brief.trim())
                   ? `0 6px 30px ${C.red}88, 0 0 60px ${C.orange}44` : "none",
@@ -493,18 +530,7 @@ export default function Home() {
             </div>
           )}
 
-          {/* ── PROMPT ── */}
-          {prompt && (
-            <div style={{
-              borderRadius: 16, padding: "clamp(14px,3vw,22px)", marginBottom: 18,
-              background: `${C.dark}cc`, backdropFilter: "blur(12px)",
-              border: `1.5px solid ${C.green}33`, animation: "reveal-up 0.5s ease-out",
-            }}>
-              <p className="bebas" style={{ fontSize: "clamp(12px,2vw,15px)", marginBottom: 8, color: C.green, letterSpacing: "0.18em" }}>🤖 GEMINI MEGA PROMPT</p>
-              <DesiDivider color={C.green} />
-              <p className="outfit" style={{ fontSize: "clamp(11px,1.8vw,13px)", lineHeight: 1.85, color: `${C.cream}77`, margin: "10px 0 0" }}>{prompt}</p>
-            </div>
-          )}
+          {/* prompt hidden intentionally */}
 
           {/* ── ERROR ── */}
           {status === "error" && (
