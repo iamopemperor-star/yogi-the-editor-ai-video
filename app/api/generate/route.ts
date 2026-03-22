@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import RunwayML from "@runwayml/sdk";
 import { NextRequest } from "next/server";
 
-export const maxDuration = 60; // Vercel Hobby plan max
+export const maxDuration = 10;
 
 function send(controller: ReadableStreamDefaultController, data: object) {
   controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify(data)}\n\n`));
