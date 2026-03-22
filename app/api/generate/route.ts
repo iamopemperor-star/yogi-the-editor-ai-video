@@ -9,7 +9,8 @@ function send(controller: ReadableStreamDefaultController, data: object) {
 }
 
 export async function POST(req: NextRequest) {
-  const { brief } = await req.json();
+  const { brief, runwayKey } = await req.json();
+  const runwayApiKey = runwayKey?.trim() || process.env.RUNWAYML_API_SECRET!;
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -34,7 +35,7 @@ Output ONLY the prompt. Nothing else.`);
 
         // Step 3: Runway
         send(controller, { step: 3 });
-        const runway = new RunwayML({ apiKey: process.env.RUNWAYML_API_SECRET! });
+        const runway = new RunwayML({ apiKey: runwayApiKey });
         const task = await runway.textToVideo.create({
           model: "gen4.5",
           promptText: megaPrompt,
