@@ -178,7 +178,7 @@ export default function Home() {
 
             {/* Title */}
             <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"clamp(6px,2vw,18px)", marginBottom:10 }}>
-              <Star size={Math.min(52,Math.max(28,window?.innerWidth*0.05||44))} color={YELLOW} spin/>
+              <Star size={44} color={YELLOW} spin/>
               <div style={{ position:"relative" }}>
                 <h1 style={{
                   fontFamily:"'Bebas Neue',Impact,sans-serif",
@@ -196,7 +196,7 @@ export default function Home() {
                   animation:"glitch-g 10s infinite", userSelect:"none", pointerEvents:"none",
                 }}>YOGI THE EDITOR</h1>
               </div>
-              <Star size={Math.min(52,Math.max(28,window?.innerWidth*0.05||44))} color={PINK} spin rev/>
+              <Star size={44} color={PINK} spin rev/>
             </div>
 
             <p style={{ fontFamily:"'Outfit',sans-serif", fontWeight:600, fontSize:"clamp(12px,2.3vw,15px)", color:`${CREAM}77`, letterSpacing:"0.04em" }}>
