@@ -115,39 +115,14 @@ function TruckTitle() {
 
       {/* Main truck art text */}
       <div style={{ position:"relative", display:"inline-block" }}>
-        {/* Deep shadow layers (3D depth) */}
-        {[ORG,BLU,NEO,MAG].map((c,i)=>(
-          <h1 key={i} aria-hidden style={{
-            position:"absolute", inset:0,
-            fontFamily:"'Bebas Neue',Impact,sans-serif",
-            fontSize:"clamp(3rem,11vw,7.5rem)",
-            lineHeight:0.95, letterSpacing:"0.04em",
-            color:"transparent", WebkitTextStroke:`2px ${c}`,
-            transform:`translate(${(i+1)*4}px,${(i+1)*4}px)`,
-            opacity: 0.7 - i*0.1,
-          }}>YOGI THE EDITOR</h1>
-        ))}
-        {/* Main text */}
         <h1 style={{
           fontFamily:"'Bebas Neue',Impact,sans-serif",
           fontSize:"clamp(3rem,11vw,7.5rem)",
-          lineHeight:0.95, letterSpacing:"0.04em", position:"relative",
-          background:`linear-gradient(135deg,${GLD} 0%,${CRM} 30%,${MAG} 55%,${GLD} 80%,${NEO} 100%)`,
+          lineHeight:0.95, letterSpacing:"0.04em",
+          background:`linear-gradient(135deg,${GLD} 0%,${CRM} 35%,${MAG} 65%,${GLD} 100%)`,
           backgroundSize:"300% auto",
           WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent",
           animation:"truck-shimmer 5s linear infinite",
-          WebkitTextStroke:"1px rgba(255,255,255,0.2)",
-        }}>YOGI THE EDITOR</h1>
-        {/* Glitch ghost */}
-        <h1 aria-hidden style={{
-          position:"absolute",inset:0,
-          fontFamily:"'Bebas Neue',Impact,sans-serif",
-          fontSize:"clamp(3rem,11vw,7.5rem)",
-          lineHeight:0.95,letterSpacing:"0.04em",
-          background:`linear-gradient(135deg,${NEO},${BLU})`,
-          WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",
-          animation:"glitch-ghost 8s infinite",
-          userSelect:"none",pointerEvents:"none",
         }}>YOGI THE EDITOR</h1>
       </div>
 
