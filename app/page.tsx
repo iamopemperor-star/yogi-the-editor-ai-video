@@ -21,8 +21,8 @@ const MODELS = [
 
 const STEPS = [
   {id:1,icon:"🎬",label:"Preparing",  desc:"Setting up request"},
-  {id:2,icon:"🚀",label:"Generating", desc:"AI creating video"},
-  {id:3,icon:"⏳",label:"Processing", desc:"Rendering frames"},
+  {id:2,icon:"🚀",label:"Queued",     desc:"Runway received your prompt"},
+  {id:3,icon:"⏳",label:"Rendering",  desc:"AI generating frames (1-3 min)"},
   {id:4,icon:"✨",label:"Finishing",  desc:"Almost ready!"},
 ];
 
@@ -292,23 +292,39 @@ export default function Home() {
     setStatus("loading"); setStep(1); setStepDone([]);
     setVideoUrl(""); setError("");
     try {
+      // Step 1: start the task
+      setStep(2);
       const res = await fetch("/api/generate",{
         method:"POST",headers:{"Content-Type":"application/json"},
         body:JSON.stringify({ brief, model }),
       });
-      const reader = res.body!.getReader();
-      const dec = new TextDecoder();
+      const data = await res.json();
+      if(data.error) { setError(data.error); setStatus("error"); return; }
+      const { taskId } = data;
+      setStepDone([1,2]);
+
+      // Step 2: poll until done (frontend polling — no server timeout issue)
+      setStep(3);
       while(true){
-        const {done,value} = await reader.read();
-        if(done) break;
-        for(const line of dec.decode(value).split("\n").filter(l=>l.startsWith("data:"))){
-          try{
-            const d = JSON.parse(line.slice(5));
-            if(d.step)  { setStep(d.step); setStepDone(p=>[...new Set([...p,d.step-1])]); }
-            if(d.video) { setVideoUrl(d.video); setStatus("done"); }
-            if(d.error) { setError(d.error); setStatus("error"); }
-          }catch{}
+        await new Promise(r=>setTimeout(r,6000));
+        const poll = await fetch(`/api/poll?taskId=${encodeURIComponent(taskId)}`);
+        const p = await poll.json();
+        if(p.error) { setError(p.error); setStatus("error"); return; }
+        if(p.status==="SUCCEEDED"){
+          setStepDone([1,2,3]);
+          setStep(4);
+          await new Promise(r=>setTimeout(r,400));
+          setStepDone([1,2,3,4]);
+          setVideoUrl(p.videoUrl);
+          setStatus("done");
+          return;
         }
+        if(p.status==="FAILED"){
+          setError(p.error ?? "Runway generation failed");
+          setStatus("error");
+          return;
+        }
+        // still PENDING / RUNNING — keep polling
       }
     }catch(e:unknown){
       setError(e instanceof Error ? e.message : "Error");
