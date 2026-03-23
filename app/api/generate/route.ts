@@ -7,7 +7,8 @@ function send(controller: ReadableStreamDefaultController, data: object) {
 }
 
 export async function POST(req: Request) {
-  const { brief } = await req.json();
+  const { brief, model = "gen4.5" } = await req.json();
+  const duration = model === "gen4.5" ? 10 : 5;
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -18,10 +19,10 @@ export async function POST(req: Request) {
         send(controller, { step: 2 });
         const runway = new RunwayML({ apiKey: process.env.RUNWAYML_API_SECRET! });
         const task = await runway.textToVideo.create({
-          model: "gen4.5",
+          model: model,
           promptText: brief.slice(0, 900),
           ratio: "720:1280",
-          duration: 10,
+          duration: duration,
         });
 
         send(controller, { step: 3 });
