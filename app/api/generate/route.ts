@@ -4,15 +4,14 @@ export const maxDuration = 10;
 
 export async function POST(req: Request) {
   try {
-    const { brief, model = "gen4.5" } = await req.json();
-    const duration = model === "gen4.5" ? 10 : 5;
+    const { brief } = await req.json();
 
     const runway = new RunwayML({ apiKey: process.env.RUNWAYML_API_SECRET! });
     const task = await runway.textToVideo.create({
-      model: model,
+      model: "gen4.5",
       promptText: brief.slice(0, 900),
       ratio: "720:1280",
-      duration: duration,
+      duration: 5,
     });
 
     return Response.json({ taskId: task.id });

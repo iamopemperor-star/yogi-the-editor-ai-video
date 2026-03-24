@@ -12,12 +12,6 @@ const BLU  = "#0055FF";   // Blue neon
 const CRM  = "#F5F0E8";   // Cream
 const DRK  = "#0D0040";   // Very dark
 
-/* ══════════════ MODELS ══════════════ */
-const MODELS = [
-  { id:"gen4.5",      name:"Gen 4.5",      badge:"BEST",    color:GLD, glow:"#FFB80088", stars:5, desc:"Max quality · 10s" },
-  { id:"gen4_turbo",  name:"Gen 4 Turbo",  badge:"FAST",    color:NEO, glow:"#00FF4188", stars:4, desc:"Balanced · 5s"     },
-  { id:"gen3a_turbo", name:"Gen 3 Turbo",  badge:"LITE",    color:MAG, glow:"#FF009088", stars:3, desc:"Budget · 5s"       },
-];
 
 const STEPS = [
   {id:1,icon:"🎬",label:"Preparing",  desc:"Setting up request"},
@@ -137,56 +131,6 @@ function TruckTitle() {
   );
 }
 
-/* ══════════════ MODEL SELECTOR ══════════════ */
-function ModelPicker({ value, onChange }: { value:string; onChange:(v:string)=>void }) {
-  return (
-    <div>
-      <p style={{ fontFamily:"'Bebas Neue',sans-serif",fontSize:"clamp(13px,2.2vw,17px)",
-        letterSpacing:"0.15em",color:GLD,marginBottom:10 }}>
-        🎯 SELECT AI MODEL
-      </p>
-      <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"clamp(6px,2vw,12px)" }}>
-        {MODELS.map(m=>{
-          const active = value===m.id;
-          return (
-            <button key={m.id} onClick={()=>onChange(m.id)} style={{
-              padding:"clamp(10px,2vw,16px) 8px",borderRadius:14,border:"none",
-              cursor:"pointer",transition:"all 0.3s",position:"relative",overflow:"hidden",
-              background:active?`linear-gradient(135deg,${m.color}33,${DRK})`:"rgba(13,0,64,0.6)",
-              backdropFilter:"blur(20px)",
-              boxShadow:active?`0 0 0 2px ${m.color},0 0 20px ${m.glow},inset 0 1px 0 rgba(255,255,255,0.1)`
-                :"0 0 0 1px rgba(255,255,255,0.08),inset 0 1px 0 rgba(255,255,255,0.05)",
-              transform:active?"translateY(-2px)":"none",
-            }}>
-              {active&&<div style={{ position:"absolute",top:0,left:0,width:"50%",height:"100%",
-                background:"linear-gradient(105deg,transparent 40%,rgba(255,255,255,0.08) 50%,transparent 60%)",
-                animation:"liquid-shine 3s ease-in-out infinite",pointerEvents:"none" }}/>}
-              {/* Badge */}
-              <div style={{
-                fontSize:"clamp(7px,1.1vw,9px)",fontWeight:800,letterSpacing:"0.15em",
-                padding:"2px 8px",borderRadius:999,display:"inline-block",marginBottom:6,
-                background:m.color,color:DRK,fontFamily:"'Outfit',sans-serif",
-              }}>{m.badge}</div>
-              <div style={{ fontFamily:"'Bebas Neue',sans-serif",fontSize:"clamp(13px,2.2vw,18px)",
-                letterSpacing:"0.08em",color:active?m.color:CRM,lineHeight:1.1,
-                textShadow:active?`0 0 12px ${m.color}`:undefined }}>
-                {m.name}
-              </div>
-              <div style={{ fontSize:"clamp(8px,1.3vw,10px)",color:`${CRM}77`,marginTop:3,
-                fontFamily:"'Outfit',sans-serif" }}>
-                {m.desc}
-              </div>
-              <div style={{ marginTop:6,fontSize:"clamp(8px,1.3vw,11px)",
-                color:active?m.color:`${CRM}44`,textShadow:active?`0 0 8px ${m.color}`:undefined }}>
-                {"★".repeat(m.stars)}{"☆".repeat(5-m.stars)}
-              </div>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
 
 /* ══════════════ BACKGROUND ══════════════ */
 function Background() {
@@ -264,7 +208,6 @@ function Frame() {
 /* ══════════════ MAIN ══════════════ */
 export default function Home() {
   const [brief, setBrief]       = useState("");
-  const [model, setModel]       = useState("gen4.5");
   const [status, setStatus]     = useState<"idle"|"loading"|"done"|"error">("idle");
   const [currentStep, setStep]  = useState(0);
   const [stepDone, setStepDone] = useState<number[]>([]);
@@ -296,7 +239,7 @@ export default function Home() {
       setStep(2);
       const res = await fetch("/api/generate",{
         method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({ brief, model }),
+        body:JSON.stringify({ brief }),
       });
       const data = await res.json();
       if(data.error) { setError(data.error); setStatus("error"); return; }
@@ -333,8 +276,7 @@ export default function Home() {
   }
 
   if(!mounted) return null;
-  const busy = status==="loading";
-  const activeModel = MODELS.find(m=>m.id===model)!;
+  const busy = status==="loading";;
 
   return (
     <>
@@ -371,11 +313,6 @@ export default function Home() {
               ))}
             </div>
           </div>
-
-          {/* ── MODEL SELECTOR ── */}
-          <Glass glow={activeModel.glow} style={{ padding:"clamp(16px,3vw,24px)" }}>
-            <ModelPicker value={model} onChange={setModel}/>
-          </Glass>
 
           {/* ── INPUT CARD (3D tilt) ── */}
           <div ref={cardRef} style={{ transition:"transform 0.15s ease-out" }}
@@ -448,10 +385,10 @@ export default function Home() {
                   PIPELINE RUNNING
                 </p>
                 <div style={{ marginLeft:"auto",padding:"2px 10px",borderRadius:999,
-                  background:`${activeModel.color}22`,border:`1px solid ${activeModel.color}55`,
-                  fontSize:"clamp(9px,1.4vw,10px)",color:activeModel.color,fontWeight:700,
+                  background:`${GLD}22`,border:`1px solid ${GLD}55`,
+                  fontSize:"clamp(9px,1.4vw,10px)",color:GLD,fontWeight:700,
                   fontFamily:"'Outfit',sans-serif" }}>
-                  {activeModel.name}
+                  Gen 4.5
                 </div>
               </div>
               <div style={{ display:"flex",flexDirection:"column",gap:12 }}>
