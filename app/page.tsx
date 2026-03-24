@@ -117,7 +117,7 @@ function TruckTitle() {
           backgroundSize:"300% auto",
           WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent",
           animation:"truck-shimmer 5s linear infinite",
-        }}>DREAM DREAMCATCHER</h1>
+        }}>DREAMCATCHER</h1>
       </div>
 
       {/* Truck art border line */}
@@ -483,7 +483,7 @@ export default function Home() {
             </div>
             <p style={{ fontFamily:"'Outfit',sans-serif",fontSize:"clamp(9px,1.4vw,11px)",
               color:`${CRM}33`,letterSpacing:"0.1em" }}>
-              ✦ Powered by Runway ML · Built by Dream Dreamcatcher ✦
+              ✦ Powered by Runway ML · Built by Dreamcatcher ✦
             </p>
           </div>
 
