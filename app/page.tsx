@@ -117,7 +117,7 @@ function TruckTitle() {
           backgroundSize:"300% auto",
           WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent",
           animation:"truck-shimmer 5s linear infinite",
-        }}>YOGI THE EDITOR</h1>
+        }}>DREAM DREAMCATCHER</h1>
       </div>
 
       {/* Truck art border line */}
@@ -459,7 +459,7 @@ export default function Home() {
                 maxHeight:"clamp(280px,55vw,560px)",background:"#000",
                 border:`2px solid ${NEO}44`,boxShadow:`0 0 40px ${NEO}33`,
               }}/>
-              <a href={videoUrl} download="yogi-ai-video.mp4" style={{
+              <a href={videoUrl} download="dreamcatcher-ai-video.mp4" style={{
                 display:"inline-flex",alignItems:"center",gap:8,
                 padding:"clamp(12px,2.5vw,16px) clamp(28px,5vw,52px)",
                 borderRadius:14,fontFamily:"'Bebas Neue',sans-serif",
@@ -483,7 +483,7 @@ export default function Home() {
             </div>
             <p style={{ fontFamily:"'Outfit',sans-serif",fontSize:"clamp(9px,1.4vw,11px)",
               color:`${CRM}33`,letterSpacing:"0.1em" }}>
-              ✦ Powered by Runway ML · Built by Yogi The Editor ✦
+              ✦ Powered by Runway ML · Built by Dream Dreamcatcher ✦
             </p>
           </div>
 
