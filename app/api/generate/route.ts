@@ -11,7 +11,7 @@ export async function POST(req: Request) {
       model: "gen4.5",
       promptText: brief.slice(0, 900),
       ratio: "720:1280",
-      duration: 5,
+      duration: 2,
     });
 
     return Response.json({ taskId: task.id });
